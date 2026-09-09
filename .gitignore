@@ -14,3 +14,6 @@ __pycache__/
 
 # QR code gerado (depende do endereco final, cada pessoa gera o seu)
 qrcode_estacao.png
+
+# Ficheiros locais do Claude Code, nada a ver com o projeto em si
+.claude/

@@ -14,6 +14,13 @@ import posicoes
 
 app = Flask(__name__)
 
+# Isto tem de correr sempre que o modulo e importado, nao so quando o
+# ficheiro e corrido diretamente - em producao (Render) e o gunicorn
+# que importa "app", nunca executa o "if __name__" mais abaixo. Sem
+# esta linha aqui, as tabelas nunca eram criadas em producao e todos os
+# pedidos a base de dados falhavam.
+base_dados.criar_tabelas()
+
 
 @app.route("/")
 def pagina_principal():
@@ -33,20 +40,22 @@ def api_visiveis():
     # mostrar um erro feio. Devolvemos sempre uma resposta valida, e
     # avisamos o utilizador em vez de rebentar.
     try:
-        visiveis = posicoes.calcular_visiveis()
-        return jsonify({"ok": True, "satelites": visiveis, "aviso": None})
+        visiveis, aviso = posicoes.calcular_visiveis()
+        return jsonify({"ok": True, "satelites": visiveis, "aviso": aviso})
     except Exception as erro:
         return jsonify({"ok": False, "satelites": [], "aviso": str(erro)})
 
 
 @app.route("/api/historico")
 def api_historico():
-    passagens = base_dados.listar_passagens(limite=100)
-    return jsonify({"passagens": passagens})
+    try:
+        passagens = base_dados.listar_passagens(limite=100)
+        return jsonify({"ok": True, "passagens": passagens})
+    except Exception as erro:
+        return jsonify({"ok": False, "passagens": [], "aviso": str(erro)})
 
 
 if __name__ == "__main__":
-    base_dados.criar_tabelas()
     # host="0.0.0.0" permite abrir a pagina a partir de outro telemovel
     # na mesma rede Wi-Fi (usando o IP do portatil), nao so no proprio
     # computador.

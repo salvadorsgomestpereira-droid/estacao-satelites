@@ -18,9 +18,11 @@ import tle
 
 
 def calcular_visiveis():
-    """Devolve uma lista de dicionarios, um por satelite acima do
-    horizonte agora, ordenada do mais alto no ceu para o mais baixo."""
-    satelites = tle.carregar_satelites()
+    """Devolve (visiveis, aviso). "visiveis" e uma lista de dicionarios,
+    um por satelite acima do horizonte agora, ordenada do mais alto no
+    ceu para o mais baixo. "aviso" vem de tle.carregar_satelites() - ver
+    ali a explicacao de quando e preenchido."""
+    satelites, aviso = tle.carregar_satelites()
     observador = tle.criar_observador()
     ts = load.timescale()
     agora = ts.now()
@@ -68,4 +70,4 @@ def calcular_visiveis():
         })
 
     visiveis.sort(key=lambda satelite: satelite["altura_graus"], reverse=True)
-    return visiveis
+    return visiveis, aviso

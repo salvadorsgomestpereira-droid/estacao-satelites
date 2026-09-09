@@ -14,7 +14,11 @@ CAMINHO_BD = Path("satelites.db")
 
 
 def obter_ligacao():
-    ligacao = sqlite3.connect(CAMINHO_BD)
+    # timeout=10: se outro processo (por exemplo, o historico.py a
+    # correr em segundo plano) estiver a escrever na base de dados
+    # mesmo nesse instante, espera ate 10 segundos antes de desistir,
+    # em vez de falhar logo com "database is locked".
+    ligacao = sqlite3.connect(CAMINHO_BD, timeout=10)
     # Assim conseguimos aceder as colunas pelo nome (linha["nome"]) em
     # vez de so pela posicao (linha[0], linha[1], ...).
     ligacao.row_factory = sqlite3.Row

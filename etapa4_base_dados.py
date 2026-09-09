@@ -4,6 +4,10 @@ Etapa 4 - Base de dados de informacao
 Cruza os TLE (que dao a orbita) com o satcat (que da pais, ano de
 lancamento e tipo de objeto), usando o numero de catalogo NORAD como
 "chave" comum aos dois ficheiros, e guarda tudo em SQLite.
+
+Este programa corre uma vez para preencher a base de dados. No
+alojamento online (Render), corre automaticamente a cada novo deploy,
+como parte do "Build Command" (ver README.md).
 """
 
 import sys
@@ -12,14 +16,14 @@ import base_dados
 import satcat
 import tle
 
-sys.stdout.reconfigure(encoding="utf-8")
 
-
-def main():
-    print("A descarregar TLE...")
-    satelites = tle.carregar_satelites()
-
-    print("A descarregar satcat...")
+def popular_base_dados():
+    """Descarrega TLE e satcat, cruza-os pelo numero NORAD, e guarda
+    tudo em satelites.db. Devolve (guardados, sem_info) para o
+    relatorio no ecra."""
+    satelites, aviso = tle.carregar_satelites()
+    if aviso:
+        print(f"Aviso: {aviso}")
     info_satcat = satcat.carregar_satcat()
 
     base_dados.criar_tabelas()
@@ -49,6 +53,16 @@ def main():
             norad_id, satelite.name, categoria, pais_operador, ano_lancamento, tipo_objeto
         )
         guardados += 1
+
+    return guardados, sem_info
+
+
+def main():
+    sys.stdout.reconfigure(encoding="utf-8")
+
+    print("A descarregar TLE...")
+    print("A descarregar satcat...")
+    guardados, sem_info = popular_base_dados()
 
     print(f"\nGuardados {guardados} satelites na base de dados "
           f"({sem_info} sem informacao correspondente no satcat).")

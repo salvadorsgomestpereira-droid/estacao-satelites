@@ -30,7 +30,9 @@ def um_ciclo(em_curso):
     que acabaram de terminar. Recebe e devolve o dicionario em_curso,
     que guarda o estado entre chamadas (norad_id -> dados da passagem)."""
     try:
-        visiveis = posicoes.calcular_visiveis()
+        visiveis, aviso = posicoes.calcular_visiveis()
+        if aviso:
+            print(f"Aviso: {aviso}")
     except Exception as erro:
         print(f"Aviso: nao foi possivel calcular os satelites visiveis ({erro}). A tentar de novo no proximo ciclo.")
         return em_curso

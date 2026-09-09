@@ -50,6 +50,10 @@ async function atualizar() {
 
     if (!dados.ok) {
         mostrarAviso("Nao foi possivel atualizar os dados (" + dados.aviso + "). A mostrar os ultimos dados conhecidos.");
+    } else if (dados.aviso) {
+        // ok=true mas com aviso: os dados chegaram, mas tle.py teve de
+        // usar uma copia desatualizada ou o modo de demonstracao.
+        mostrarAviso(dados.aviso);
     } else {
         esconderAviso();
     }

@@ -2,8 +2,24 @@
 // e num grafico simples de barras (quantas passagens por dia).
 
 async function carregar() {
-    const resposta = await fetch("/api/historico");
-    const dados = await resposta.json();
+    const avisoEl = document.getElementById("aviso");
+    let dados;
+    try {
+        const resposta = await fetch("/api/historico");
+        dados = await resposta.json();
+    } catch (erro) {
+        avisoEl.textContent = "Sem ligacao ao servidor. A tentar de novo em breve...";
+        avisoEl.hidden = false;
+        return;
+    }
+
+    if (!dados.ok) {
+        avisoEl.textContent = "Nao foi possivel ir buscar o historico (" + dados.aviso + ").";
+        avisoEl.hidden = false;
+    } else {
+        avisoEl.hidden = true;
+    }
+
     const passagens = dados.passagens;
 
     const lista = document.getElementById("lista-historico");

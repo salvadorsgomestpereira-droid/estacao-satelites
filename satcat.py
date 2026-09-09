@@ -70,8 +70,14 @@ def _ficheiro_esta_atualizado():
     return idade_segundos < IDADE_MAXIMA_SEGUNDOS
 
 
+# Nao esperamos mais do que isto por uma resposta da rede - sem
+# tempo-limite, se o servidor nao responder, o programa podia ficar
+# bloqueado indefinidamente em vez de usar a copia de reserva.
+TEMPO_LIMITE_SEGUNDOS = 15
+
+
 def _descarregar():
-    with urlopen(URL_SATCAT, timeout=30) as resposta:
+    with urlopen(URL_SATCAT, timeout=TEMPO_LIMITE_SEGUNDOS) as resposta:
         dados = resposta.read()
     FICHEIRO_CACHE.write_bytes(dados)
 
@@ -106,13 +112,16 @@ def carregar_satcat():
         try:
             _descarregar()
         except Exception as erro:
-            if FICHEIRO_CACHE.exists():
-                print(f"Aviso: nao foi possivel atualizar o satcat ({erro}). "
-                      "A usar a copia guardada, que pode estar desatualizada.")
-            elif FICHEIRO_RESERVA.exists():
-                print("Aviso: sem rede e sem copia local do satcat. A usar a copia de reserva.")
-                return _analisar(FICHEIRO_RESERVA.read_text(encoding="utf-8"))
-            else:
-                raise
+            print(f"Aviso: nao foi possivel atualizar o satcat ({erro}).")
 
-    return _analisar(FICHEIRO_CACHE.read_text(encoding="utf-8"))
+    # A esta altura pode existir uma copia local (nova ou antiga, se a
+    # atualizacao falhou). Se existir e conseguirmos le-la, usamo-la;
+    # senao, caimos para a copia de reserva do repositorio.
+    if FICHEIRO_CACHE.exists():
+        try:
+            return _analisar(FICHEIRO_CACHE.read_text(encoding="utf-8"))
+        except Exception as erro:
+            print(f"Aviso: a copia local do satcat esta corrompida ({erro}).")
+
+    print("Aviso: sem copia local valida do satcat. A usar a copia de reserva.")
+    return _analisar(FICHEIRO_RESERVA.read_text(encoding="utf-8"))

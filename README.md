@@ -99,8 +99,15 @@ gratuito não permite isso, só o Render/serviços parecidos).
    repositório do GitHub que acabaste de criar.
 
 5. Configurar:
-   - **Build Command:** `pip install -r requirements.txt`
-   - **Start Command:** `gunicorn --bind 0.0.0.0:$PORT app:app` (já está também no ficheiro `Procfile`) — o `$PORT` é obrigatório porque é o Render que escolhe a porta, e sem isto o deploy falha com "no open ports detected"
+   - **Build Command:** `pip install -r requirements.txt && python etapa4_base_dados.py`
+     (o segundo comando pré-preenche a base de dados e a cache de TLE
+     *durante* a construção, para o primeiro pedido a seguir ao deploy
+     já ter tudo pronto, em vez de ter de descarregar tudo na hora)
+   - **Start Command:** `gunicorn --bind 0.0.0.0:$PORT --timeout 60 app:app`
+     (já está também no ficheiro `Procfile`) — o `$PORT` é obrigatório
+     porque é o Render que escolhe a porta, e sem isto o deploy falha
+     com "no open ports detected"; o `--timeout 60` dá tempo suficiente
+     para o pedido às vezes ter de voltar a descarregar TLE
 
 6. Clicar em **Create Web Service** e esperar alguns minutos. O Render
    dá-te um endereço parecido com `https://estacao-satelites.onrender.com`.
