@@ -204,6 +204,18 @@ servidor gratuito demora a "acordar", os pedidos de TLE sem
 tempo-limite ficavam pendurados, e a página dava erro 500 em vez de
 mostrar os dados de reserva.
 
+Depois de pôr o tempo-limite, ainda apareceu uma segunda versão do
+mesmo problema: `tle.py` tenta 5 categorias de satélites uma a seguir à
+outra, e cada uma tentava a rede com o seu próprio tempo-limite de 8s —
+se a rede estivesse mesmo em baixo, isso eram até 5×8s = 40 segundos só
+para descobrir que não havia rede nenhuma, o que ainda chegava a
+ultrapassar o tempo-limite do próprio servidor gunicorn. A correção
+final foi: assim que uma categoria falha por falta de rede, lembrar
+isso (`rede_ja_falhou`) e as categorias seguintes vão logo para a cópia
+local/reserva sem voltar a tentar a rede. É um bom exemplo de como um
+tempo-limite por pedido não chega sozinho — também é preciso pensar no
+tempo total de *todos* os pedidos somados.
+
 ## 9. Perguntas típicas que te podem fazer
 
 - *"Porque é que usaste cache para os TLE?"* → Para não bombardear o
