@@ -32,6 +32,10 @@ Modo de trabalho que quero que sigas:
    com outras palavras só).
 5. Cobre também as perguntas da secção "Perguntas típicas" do
    NOTAS_ESTUDO.md, e mais algumas que aches que me podem fazer.
+   Inclui especialmente a secção "Como o sistema avisa (em vez de
+   rebentar)" — o mecanismo de aviso/timeout e o bug real que
+   aconteceu na primeira publicação no Render são um bom exemplo para
+   mostrar que percebo o código, não só que o copiei.
 6. No fim de tudo, faz-me um pequeno "exame simulado": escolhe ao acaso
    5 perguntas sobre partes diferentes do projeto (física e código) e
    corrige as minhas respostas.

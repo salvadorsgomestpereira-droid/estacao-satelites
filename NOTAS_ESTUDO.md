@@ -136,7 +136,7 @@ a gravidade é mais fraca, e uma velocidade menor já basta para manter a
 | Ficheiro | O que faz |
 |---|---|
 | `config.py` | Coordenadas do observador, categorias de satélites, modo de demonstração, altura mínima |
-| `tle.py` | Descarrega/guarda em cache os TLE de cada categoria (regra das 12 horas, fallback para `reserva/`) |
+| `tle.py` | Descarrega/guarda em cache os TLE de cada categoria (regra das 12 horas, tempo-limite de 8s por pedido, fallback para `reserva/`) |
 | `satcat.py` | Descarrega/guarda em cache o catálogo de satélites (país, ano, tipo de objeto) |
 | `base_dados.py` | Cria e mexe no `satelites.db` (SQLite): tabelas `satelites` e `passagens` |
 | `posicoes.py` | Junta TLE + base de dados: calcula quem está visível agora, com todos os dados |
@@ -183,7 +183,28 @@ a gravidade é mais fraca, e uma velocidade menor já basta para manter a
    `posicoes.py` a cada 30 segundos, e regista em `satelites.db` cada
    passagem que começa e termina.
 
-## 8. Perguntas típicas que te podem fazer
+## 8. Como o sistema avisa (em vez de rebentar)
+
+Cada função que pode falhar por causa da rede devolve, além dos dados,
+um "aviso" (`tle.carregar_satelites()` → `(satelites, aviso)`,
+`posicoes.calcular_visiveis()` → `(visiveis, aviso)`). `aviso` é `None`
+quando está tudo bem, ou um texto em português pronto a mostrar quando
+algum grupo de satélites teve de usar dados desatualizados (ou o modo
+de demonstração). O `app.py` mete esse aviso dentro da resposta JSON, e
+o `script.js` mostra-o numa barra amarela no topo da página — assim o
+utilizador *vê* que os dados podem estar desatualizados, em vez de a
+página simplesmente falhar ou mostrar dados errados sem avisar.
+
+Isto só funciona porque cada pedido de rede (`urlopen(...)`) tem um
+**tempo-limite** (`TEMPO_LIMITE_SEGUNDOS`, 8s para os TLE): sem isso, se
+um servidor externo (como o Celestrak) não responder, o Python ficava
+bloqueado à espera *para sempre* em vez de desistir e mostrar o aviso.
+Foi exatamente isto que aconteceu na primeira publicação no Render: o
+servidor gratuito demora a "acordar", os pedidos de TLE sem
+tempo-limite ficavam pendurados, e a página dava erro 500 em vez de
+mostrar os dados de reserva.
+
+## 9. Perguntas típicas que te podem fazer
 
 - *"Porque é que usaste cache para os TLE?"* → Para não bombardear o
   servidor do Celestrak a cada pedido, e porque um TLE só perde
@@ -198,3 +219,9 @@ a gravidade é mais fraca, e uma velocidade menor já basta para manter a
 - *"Como sabes que o cálculo está certo?"* → Confirmámos valores
   conhecidos: a ISS a ~400 km e ~7,7 km/s, o GPS a ~20 200 km, os
   geoestacionários a ~35 786 km — todos batem certo com os valores reais.
+- *"Porque é que os pedidos de rede têm um tempo-limite (timeout)?"* →
+  Sem ele, se o servidor do Celestrak não responder, o programa fica
+  bloqueado à espera indefinidamente. Com um tempo-limite curto (8
+  segundos), o programa desiste depressa e usa a cópia guardada em vez
+  de deixar a página inteira sem resposta — foi um bug real que
+  aconteceu na primeira publicação no Render (ver secção 8).
