@@ -52,10 +52,16 @@ def _descarregar(url, caminho):
     caminho.write_bytes(dados)
 
 
-def _carregar_grupo(grupo):
+def _carregar_grupo(grupo, rede_ja_falhou):
     """Devolve (satelites, aviso). "aviso" e None quando os dados estao
     dentro das 12 horas normais; caso contrario e um texto curto a
-    explicar porque os dados podem nao estar atualizados."""
+    explicar porque os dados podem nao estar atualizados.
+
+    "rede_ja_falhou" vem de uma categoria anterior, no mesmo pedido: se
+    a rede ja falhou uma vez agora mesmo, nao vale a pena esperar outra
+    vez pelo tempo-limite para cada categoria seguinte, uma a seguir a
+    outra - isso sozinho podia demorar minutos e fazer o servidor
+    "morrer" por demorar demasiado tempo a responder."""
     caminho = _nome_ficheiro(grupo)
     caminho_reserva = PASTA_RESERVA / caminho.name
 
@@ -68,15 +74,17 @@ def _carregar_grupo(grupo):
     if _ficheiro_esta_atualizado(caminho):
         return load.tle_file(str(caminho), reload=False), None
 
-    try:
-        _descarregar(URL_BASE.format(grupo=grupo), caminho)
-        return load.tle_file(str(caminho), reload=False), None
-    except Exception as erro:
-        print(f"Aviso: nao foi possivel atualizar o TLE de '{grupo}' ({erro}).")
+    if not rede_ja_falhou:
+        try:
+            _descarregar(URL_BASE.format(grupo=grupo), caminho)
+            return load.tle_file(str(caminho), reload=False), None
+        except Exception as erro:
+            print(f"Aviso: nao foi possivel atualizar o TLE de '{grupo}' ({erro}).")
 
-    # A descarga falhou. Se existir um ficheiro local antigo, usamo-lo
-    # na mesma (mais vale um TLE com algumas horas do que nenhum); senao,
-    # caimos para a copia de reserva do repositorio.
+    # A descarga falhou (ou nem foi tentada, porque uma categoria
+    # anterior ja tinha falhado). Se existir um ficheiro local antigo,
+    # usamo-lo na mesma (mais vale um TLE com algumas horas do que
+    # nenhum); senao, caimos para a copia de reserva do repositorio.
     if caminho.exists():
         try:
             return load.tle_file(str(caminho), reload=False), "rede"
@@ -96,8 +104,11 @@ def carregar_satelites():
     demonstracao."""
     todos = []
     razoes = set()
+    rede_ja_falhou = False
     for grupo, nome_categoria in config.CATEGORIAS.items():
-        satelites, razao = _carregar_grupo(grupo)
+        satelites, razao = _carregar_grupo(grupo, rede_ja_falhou)
+        if razao == "rede":
+            rede_ja_falhou = True
         if razao:
             razoes.add(razao)
         for satelite in satelites:
