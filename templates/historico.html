@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historico - Estacao de Rastreio</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Historico de passagens</h1>
+        <p class="subtitulo">Vilamoura, Algarve</p>
+    </header>
+
+    <canvas id="grafico" height="140"></canvas>
+
+    <main id="lista-historico">
+        <p>A carregar...</p>
+    </main>
+
+    <nav class="rodape">
+        <a href="/">Agora</a>
+        <a href="/historico" class="ativo">Historico</a>
+    </nav>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="{{ url_for('static', filename='historico.js') }}"></script>
+</body>
+</html>

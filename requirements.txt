@@ -1,0 +1,6 @@
+skyfield
+tzdata
+flask
+qrcode
+pillow
+gunicorn

@@ -1,0 +1,16 @@
+# Copias locais de TLE e satcat descarregadas automaticamente - sao
+# recriadas sozinhas na primeira vez que os programas correm, por isso
+# nao precisam de ir para o repositorio (a pasta reserva/ e diferente:
+# essa e a copia de propósito guardada para o modo sem internet).
+/tle_*.txt
+/satcat_cache.csv
+
+# Base de dados local - cada pessoa que corre o projeto cria a sua propria.
+satelites.db
+
+# Ficheiros do Python
+__pycache__/
+*.pyc
+
+# QR code gerado (depende do endereco final, cada pessoa gera o seu)
+qrcode_estacao.png

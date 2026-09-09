@@ -1,0 +1,142 @@
+/* Estilo mobile-first: pensado primeiro para o telemovel (a turma vai
+   ver a pagina em ecras pequenos), e so depois alargado para ecras
+   maiores com a media query no fim do ficheiro. */
+
+:root {
+    --cor-fundo: #0b1220;
+    --cor-texto: #e8edf5;
+    --cor-texto-suave: #9fb0c8;
+    --cor-destaque: #4da3ff;
+    --cor-cartao: #141d2e;
+    --cor-aviso: #ffb703;
+    --cor-borda: #223047;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--cor-fundo);
+    color: var(--cor-texto);
+}
+
+header {
+    padding: 1rem;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.4rem;
+}
+
+.subtitulo {
+    margin: 0.2rem 0 0;
+    color: var(--cor-texto-suave);
+    font-size: 0.9rem;
+}
+
+.aviso {
+    background: var(--cor-aviso);
+    color: #1a1300;
+    padding: 0.6rem 1rem;
+    margin: 0;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+.ultima-atualizacao {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--cor-texto-suave);
+    margin: 0.4rem 0;
+}
+
+#mapa {
+    height: 220px;
+    width: 100%;
+}
+
+#grafico {
+    background: var(--cor-cartao);
+    padding: 0.5rem;
+}
+
+main {
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding-bottom: 4.5rem; /* espaco para o rodape fixo nao tapar o ultimo cartao */
+}
+
+.cartao-satelite {
+    background: var(--cor-cartao);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+}
+
+.cartao-satelite h2 {
+    margin: 0 0 0.3rem;
+    font-size: 1.05rem;
+    color: var(--cor-destaque);
+}
+
+.cartao-satelite .categoria {
+    font-size: 0.75rem;
+    color: var(--cor-texto-suave);
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin: 0;
+}
+
+.grelha-dados {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.3rem 0.8rem;
+    margin: 0.5rem 0 0;
+    font-size: 0.85rem;
+}
+
+.grelha-dados dt {
+    color: var(--cor-texto-suave);
+}
+
+.grelha-dados dd {
+    margin: 0;
+    font-weight: 600;
+}
+
+.rodape {
+    display: flex;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--cor-cartao);
+    border-top: 1px solid var(--cor-borda);
+}
+
+.rodape a {
+    flex: 1;
+    text-align: center;
+    padding: 0.8rem;
+    color: var(--cor-texto);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.rodape a.ativo {
+    color: var(--cor-destaque);
+    font-weight: 600;
+}
+
+@media (min-width: 700px) {
+    main {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
