@@ -100,7 +100,7 @@ gratuito não permite isso, só o Render/serviços parecidos).
 
 5. Configurar:
    - **Build Command:** `pip install -r requirements.txt`
-   - **Start Command:** `gunicorn app:app` (já está também no ficheiro `Procfile`)
+   - **Start Command:** `gunicorn --bind 0.0.0.0:$PORT app:app` (já está também no ficheiro `Procfile`) — o `$PORT` é obrigatório porque é o Render que escolhe a porta, e sem isto o deploy falha com "no open ports detected"
 
 6. Clicar em **Create Web Service** e esperar alguns minutos. O Render
    dá-te um endereço parecido com `https://estacao-satelites.onrender.com`.
