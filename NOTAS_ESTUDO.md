@@ -216,7 +216,25 @@ local/reserva sem voltar a tentar a rede. É um bom exemplo de como um
 tempo-limite por pedido não chega sozinho — também é preciso pensar no
 tempo total de *todos* os pedidos somados.
 
-## 9. Perguntas típicas que te podem fazer
+## 9. A página adapta-se a quem a vê
+
+A página principal pede ao browser a localização de quem a está a ver
+(`navigator.geolocation.getCurrentPosition()` em `script.js`), e manda
+essas coordenadas para o servidor no próprio pedido
+(`/api/visiveis?lat=...&lon=...`). O `app.py` lê esses parâmetros e
+passa-os a `posicoes.calcular_visiveis(latitude, longitude)`, que por
+sua vez os passa a `tle.criar_observador(...)` — a mesma função que,
+sem argumentos, usa Vilamoura. Se o visitante não autorizar (ou o
+browser não tiver geolocalização, ou o site não estiver em HTTPS), o
+`app.py` simplesmente não recebe `lat`/`lon` no pedido, e cai para
+Vilamoura — não há nenhum caso onde a página fica sem funcionar.
+
+**Importante:** o `historico.py` (o registo de passagens em segundo
+plano) **não** usa a localização de ninguém — corre sozinho no
+servidor, sem browser nenhum a perguntar-lhe nada, por isso usa sempre
+Vilamoura (`config.py`). Só a página ao vivo é que se personaliza.
+
+## 10. Perguntas típicas que te podem fazer
 
 - *"Porque é que usaste cache para os TLE?"* → Para não bombardear o
   servidor do Celestrak a cada pedido, e porque um TLE só perde

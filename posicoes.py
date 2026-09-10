@@ -1,7 +1,8 @@
 """
 posicoes.py - Calcula tudo o que interessa mostrar sobre cada satelite
-que esta acima do horizonte agora: posicao, altura/azimute vistos de
-Vilamoura, e a informacao guardada na base de dados (pais, ano, tipo).
+que esta acima do horizonte agora: posicao, altura/azimute vistos do
+observador (Vilamoura, ou a localizacao do visitante da pagina), e a
+informacao guardada na base de dados (pais, ano, tipo).
 
 Este modulo e usado tanto pela pagina web (app.py) como pelo registo de
 historico (historico.py), para os dois nunca calcularem as coisas de
@@ -17,13 +18,17 @@ import config
 import tle
 
 
-def calcular_visiveis():
+def calcular_visiveis(latitude=None, longitude=None):
     """Devolve (visiveis, aviso). "visiveis" e uma lista de dicionarios,
     um por satelite acima do horizonte agora, ordenada do mais alto no
     ceu para o mais baixo. "aviso" vem de tle.carregar_satelites() - ver
-    ali a explicacao de quando e preenchido."""
+    ali a explicacao de quando e preenchido.
+
+    latitude/longitude sao opcionais: sem eles, calcula para Vilamoura
+    (config.py). A pagina web passa aqui a localizacao do visitante,
+    quando o browser a autoriza."""
     satelites, aviso = tle.carregar_satelites()
-    observador = tle.criar_observador()
+    observador = tle.criar_observador(latitude, longitude)
     ts = load.timescale()
     agora = ts.now()
 

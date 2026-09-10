@@ -1,19 +1,28 @@
 # Estação de Rastreio de Satélites — Vilamoura
 
 Projeto Anual de Físico-Química (9.º ano). Mostra que satélites estão
-acima do horizonte em Vilamoura neste momento, prevê as próximas
-passagens, e regista um histórico de tudo o que já foi observado.
+acima do horizonte neste momento — vistos da localização de quem está a
+ver a página (se autorizar o browser a partilhá-la), ou de Vilamoura
+por omissão — prevê as próximas passagens, e regista um histórico de
+tudo o que já foi observado a partir de Vilamoura.
+
+**Nota:** o browser só dá a localização em páginas HTTPS ou em
+`localhost` — funciona na versão publicada (Render, que já é HTTPS) e
+a correr localmente em `http://localhost:5000` ou `http://127.0.0.1:5000`,
+mas **não** no endereço IP da rede Wi-Fi local (`http://192.168.x.x:5000`),
+porque esse é HTTP simples. Nesse caso a página usa Vilamoura na mesma,
+sem erro nenhum, só sem personalização.
 
 ## O que cada ficheiro faz
 
 | Ficheiro | O que faz |
 |---|---|
 | `config.py` | Coordenadas do observador (Vilamoura), categorias de satélites, modo de demonstração |
-| `tle.py` | Descarrega e guarda em cache os TLE (órbitas) de cada categoria |
+| `tle.py` | Descarrega e guarda em cache os TLE (órbitas) de cada categoria; cria o "observador" (Vilamoura por omissão, ou outra localização) |
 | `satcat.py` | Descarrega o catálogo de satélites (país, ano de lançamento, tipo) |
 | `base_dados.py` | Guarda tudo em SQLite (`satelites.db`) |
-| `posicoes.py` | Calcula, a partir dos TLE, quem está acima do horizonte agora |
-| `app.py` | Servidor web (Flask) — a página principal e a de histórico |
+| `posicoes.py` | Calcula, a partir dos TLE, quem está acima do horizonte agora, vist(o/a) de onde o observador estiver |
+| `app.py` | Servidor web (Flask) — a página principal e a de histórico; lê a localização do visitante do pedido (`?lat=&lon=`) |
 | `historico.py` | Corre em segundo plano e regista as passagens observadas |
 | `gerar_qrcode.py` | Gera um código QR que aponta para a página publicada |
 | `templates/`, `static/` | HTML, CSS e JavaScript da página web |

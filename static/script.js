@@ -3,15 +3,64 @@
 // atualizada sozinha, sem o utilizador ter de a recarregar a mao.
 
 const INTERVALO_MS = 15000;
+const VILAMOURA = { latitude: 37.08, longitude: -8.12 };
 
-const mapa = L.map("mapa").setView([37.08, -8.12], 3);
+const mapa = L.map("mapa").setView([VILAMOURA.latitude, VILAMOURA.longitude], 3);
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "&copy; colaboradores do OpenStreetMap",
 }).addTo(mapa);
 
-L.marker([37.08, -8.12]).addTo(mapa).bindPopup("Vilamoura (observador)");
-
+let marcadorObservador = null;
+let mapaJaCentrado = false;
 let marcadoresSatelites = [];
+
+// A tua localizacao (se autorizares): pedida uma vez ao browser, e
+// reusada em todos os pedidos seguintes, para nao pedir permissao de
+// novo a cada 15 segundos.
+let coordenadasVisitante = null;
+
+function pedirLocalizacao() {
+    return new Promise((resolver) => {
+        if (!navigator.geolocation) {
+            resolver(null);
+            return;
+        }
+        navigator.geolocation.getCurrentPosition(
+            (posicao) => resolver({
+                latitude: posicao.coords.latitude,
+                longitude: posicao.coords.longitude,
+            }),
+            () => resolver(null), // recusado, ou falhou - usamos Vilamoura
+            { timeout: 8000, maximumAge: 5 * 60 * 1000 }
+        );
+    });
+}
+
+function atualizarObservadorNoMapa(observador) {
+    const latlon = [observador.latitude, observador.longitude];
+
+    if (marcadorObservador === null) {
+        marcadorObservador = L.marker(latlon).addTo(mapa);
+    } else {
+        marcadorObservador.setLatLng(latlon);
+    }
+    marcadorObservador.bindPopup(observador.personalizado ? "A tua localizacao" : "Vilamoura (predefinicao)");
+
+    // So centramos o mapa a primeira vez - depois disso, se o
+    // utilizador andar a mexer/arrastar o mapa, nao lho voltamos a
+    // tirar das maos a cada atualizacao de 15 em 15 segundos.
+    if (!mapaJaCentrado) {
+        mapa.setView(latlon, 6);
+        mapaJaCentrado = true;
+    }
+
+    const subtituloEl = document.getElementById("subtitulo-local");
+    if (subtituloEl) {
+        subtituloEl.textContent = observador.personalizado
+            ? "A tua localizacao"
+            : "Vilamoura, Algarve (localizacao nao autorizada ou indisponivel)";
+    }
+}
 
 function limparMarcadoresSatelites() {
     marcadoresSatelites.forEach((marcador) => mapa.removeLayer(marcador));
@@ -38,9 +87,14 @@ function criarCartao(satelite) {
 }
 
 async function atualizar() {
+    let url = "/api/visiveis";
+    if (coordenadasVisitante) {
+        url += `?lat=${coordenadasVisitante.latitude}&lon=${coordenadasVisitante.longitude}`;
+    }
+
     let dados;
     try {
-        const resposta = await fetch("/api/visiveis");
+        const resposta = await fetch(url);
         dados = await resposta.json();
     } catch (erro) {
         // Falha de rede entre o telemovel e o servidor (nao entre o
@@ -57,6 +111,10 @@ async function atualizar() {
         mostrarAviso(dados.aviso);
     } else {
         esconderAviso();
+    }
+
+    if (dados.observador) {
+        atualizarObservadorNoMapa(dados.observador);
     }
 
     const lista = document.getElementById("lista-satelites");
@@ -91,5 +149,13 @@ function esconderAviso() {
     document.getElementById("aviso").hidden = true;
 }
 
-atualizar();
-setInterval(atualizar, INTERVALO_MS);
+async function iniciar() {
+    // Pedimos a localizacao uma vez, antes do primeiro pedido de dados,
+    // para logo a primeira vez ja mostrar o ceu visto de onde estas (se
+    // autorizares) em vez de mostrar primeiro Vilamoura e so depois trocar.
+    coordenadasVisitante = await pedirLocalizacao();
+    atualizar();
+    setInterval(atualizar, INTERVALO_MS);
+}
+
+iniciar();

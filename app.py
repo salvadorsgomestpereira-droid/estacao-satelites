@@ -7,9 +7,10 @@ historico de passagens observadas. A pagina principal atualiza-se
 sozinha de X em X segundos, indo buscar dados novos ao servidor.
 """
 
-from flask import Flask, jsonify, render_template
+from flask import Flask, jsonify, render_template, request
 
 import base_dados
+import config
 import etapa4_base_dados
 import posicoes
 
@@ -48,16 +49,44 @@ def pagina_historico():
     return render_template("historico.html")
 
 
+def _ler_coordenada(nome, minimo, maximo):
+    # request.args.get(..., type=float) ja devolve None se o valor nao
+    # vier no pedido ou nao for um numero valido. Se vier um numero fora
+    # do intervalo possivel (por exemplo, uma latitude de 200 graus),
+    # tratamos como se nao tivesse vindo nada, em vez de deixar o calculo
+    # rebentar com coordenadas sem sentido.
+    valor = request.args.get(nome, type=float)
+    if valor is None or not (minimo <= valor <= maximo):
+        return None
+    return valor
+
+
 @app.route("/api/visiveis")
 def api_visiveis():
+    # A pagina pede ao browser a localizacao de quem a esta a ver, e
+    # manda-a aqui em ?lat=...&lon=.... Se nao vier nenhuma (o visitante
+    # nao autorizou, ou o browser nao suporta), usamos Vilamoura.
+    latitude = _ler_coordenada("lat", -90, 90)
+    longitude = _ler_coordenada("lon", -180, 180)
+    personalizado = latitude is not None and longitude is not None
+
     # Isto vai ser demonstrado ao vivo a uma turma, provavelmente com
     # Wi-Fi fraco - por isso, se alguma coisa correr mal (por exemplo,
     # falha de rede sem nenhuma copia local de TLE), a pagina nunca deve
     # mostrar um erro feio. Devolvemos sempre uma resposta valida, e
     # avisamos o utilizador em vez de rebentar.
     try:
-        visiveis, aviso = posicoes.calcular_visiveis()
-        return jsonify({"ok": True, "satelites": visiveis, "aviso": aviso})
+        visiveis, aviso = posicoes.calcular_visiveis(latitude, longitude)
+        return jsonify({
+            "ok": True,
+            "satelites": visiveis,
+            "aviso": aviso,
+            "observador": {
+                "latitude": latitude if personalizado else config.OBSERVADOR_LATITUDE,
+                "longitude": longitude if personalizado else config.OBSERVADOR_LONGITUDE,
+                "personalizado": personalizado,
+            },
+        })
     except Exception as erro:
         return jsonify({"ok": False, "satelites": [], "aviso": str(erro)})
 

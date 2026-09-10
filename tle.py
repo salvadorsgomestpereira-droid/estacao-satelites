@@ -124,11 +124,19 @@ def carregar_satelites():
     return todos, aviso
 
 
-def criar_observador():
-    # wgs84.latlon cria um ponto na superficie da Terra (modelo WGS84),
-    # a partir do qual medimos altura e azimute dos satelites.
-    return wgs84.latlon(
-        config.OBSERVADOR_LATITUDE,
-        config.OBSERVADOR_LONGITUDE,
-        elevation_m=config.OBSERVADOR_ALTITUDE_M,
-    )
+def criar_observador(latitude=None, longitude=None):
+    """Cria o ponto de observacao. Sem argumentos, usa Vilamoura (as
+    coordenadas em config.py) - e o que o historico.py e os programas
+    de linha de comandos usam sempre. A pagina web pode passar a
+    latitude/longitude de quem esta a ver a pagina (pedida ao browser),
+    para mostrar o ceu visto de onde a pessoa realmente esta."""
+    if latitude is None:
+        latitude = config.OBSERVADOR_LATITUDE
+    if longitude is None:
+        longitude = config.OBSERVADOR_LONGITUDE
+
+    # O browser normalmente nao da a altitude do visitante (ou da-a com
+    # pouca confianca), e a diferenca de uns metros/dezenas de metros
+    # tem um efeito minimo nestes calculos - por isso usamos sempre a
+    # altitude de Vilamoura como aproximacao, mesmo para outras coordenadas.
+    return wgs84.latlon(latitude, longitude, elevation_m=config.OBSERVADOR_ALTITUDE_M)
