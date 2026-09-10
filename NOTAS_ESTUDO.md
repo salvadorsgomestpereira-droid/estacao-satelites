@@ -139,8 +139,8 @@ a gravidade é mais fraca, e uma velocidade menor já basta para manter a
 | `tle.py` | Descarrega/guarda em cache os TLE de cada categoria (regra das 12 horas, tempo-limite de 8s por pedido, fallback para `reserva/`) |
 | `satcat.py` | Descarrega/guarda em cache o catálogo de satélites (país, ano, tipo de objeto) |
 | `base_dados.py` | Cria e mexe no `satelites.db` (SQLite): tabelas `satelites` e `passagens` |
-| `posicoes.py` | Junta TLE + base de dados: calcula quem está visível agora, com todos os dados |
-| `app.py` | Servidor Flask: página principal, página de histórico, e as duas rotas de API (`/api/visiveis`, `/api/historico`) |
+| `posicoes.py` | Junta TLE + base de dados: calcula quem está visível agora, com todos os dados (incluindo a idade, calculada a partir do ano de lançamento) |
+| `app.py` | Servidor Flask: página principal, página de histórico, as duas rotas de API (`/api/visiveis`, `/api/historico`), e popula a base de dados sozinho se estiver vazia quando arranca |
 | `historico.py` | Corre em segundo plano, sonda de 30 em 30 segundos, e regista cada passagem completa na base de dados |
 | `gerar_qrcode.py` | Gera uma imagem com um código QR a apontar para a página publicada |
 

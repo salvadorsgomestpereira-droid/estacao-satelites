@@ -31,6 +31,7 @@ function criarCartao(satelite) {
             <dt>Velocidade</dt><dd>${satelite.velocidade_km_s.toFixed(2)} km/s</dd>
             <dt>Pais / operador</dt><dd>${satelite.pais_operador ?? "desconhecido"}</dd>
             <dt>Lancamento</dt><dd>${satelite.ano_lancamento ?? "desconhecido"}</dd>
+            <dt>Idade</dt><dd>${satelite.idade_anos != null ? satelite.idade_anos + " anos" : "desconhecida"}</dd>
         </dl>
     `;
     return cartao;

@@ -102,7 +102,9 @@ gratuito não permite isso, só o Render/serviços parecidos).
    - **Build Command:** `pip install -r requirements.txt && python etapa4_base_dados.py`
      (o segundo comando pré-preenche a base de dados e a cache de TLE
      *durante* a construção, para o primeiro pedido a seguir ao deploy
-     já ter tudo pronto, em vez de ter de descarregar tudo na hora)
+     já ter tudo pronto, em vez de ter de descarregar tudo na hora — mas
+     não é obrigatório: o `app.py` também verifica sozinho, quando
+     arranca, se a base de dados está vazia, e popula-a nesse caso)
    - **Start Command:** `gunicorn --bind 0.0.0.0:$PORT --timeout 60 app:app`
      (já está também no ficheiro `Procfile`) — o `$PORT` é obrigatório
      porque é o Render que escolhe a porta, e sem isto o deploy falha

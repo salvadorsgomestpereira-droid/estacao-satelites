@@ -28,6 +28,7 @@ def calcular_visiveis():
     agora = ts.now()
 
     info_bd = base_dados.obter_toda_a_informacao()
+    ano_atual = agora.utc_datetime().year
 
     visiveis = []
     for categoria, satelite in satelites:
@@ -52,13 +53,18 @@ def calcular_visiveis():
 
         norad_id = satelite.model.satnum
         info = info_bd.get(norad_id)
+        ano_lancamento = info["ano_lancamento"] if info else None
 
         visiveis.append({
             "norad_id": norad_id,
             "nome": satelite.name,
             "categoria": categoria,
             "pais_operador": info["pais_operador"] if info else None,
-            "ano_lancamento": info["ano_lancamento"] if info else None,
+            "ano_lancamento": ano_lancamento,
+            # Idade em anos, contando so o ano (o satcat so nos da o ano
+            # de lancamento, nao o dia exato) - por isso e uma
+            # aproximacao, nao um valor exato ao dia.
+            "idade_anos": (ano_atual - ano_lancamento) if ano_lancamento else None,
             "tipo_objeto": info["tipo_objeto"] if info else None,
             "altura_graus": altura.degrees,
             "azimute_graus": azimute.degrees,

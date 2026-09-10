@@ -66,6 +66,15 @@ def guardar_satelite(norad_id, nome, categoria, pais_operador, ano_lancamento, t
         """, (norad_id, nome, categoria, pais_operador, ano_lancamento, tipo_objeto))
 
 
+def total_satelites():
+    """Quantos satelites ha guardados. Usado para saber se a base de
+    dados ainda esta vazia (por exemplo, na primeira vez que o servidor
+    arranca num alojamento novo)."""
+    with obter_ligacao() as ligacao:
+        linha = ligacao.execute("SELECT COUNT(*) AS total FROM satelites").fetchone()
+    return linha["total"]
+
+
 def obter_toda_a_informacao():
     """Devolve um dicionario {norad_id: linha} com a informacao guardada
     de todos os satelites, para juntar rapidamente aos dados do TLE."""

@@ -10,6 +10,7 @@ sozinha de X em X segundos, indo buscar dados novos ao servidor.
 from flask import Flask, jsonify, render_template
 
 import base_dados
+import etapa4_base_dados
 import posicoes
 
 app = Flask(__name__)
@@ -20,6 +21,21 @@ app = Flask(__name__)
 # esta linha aqui, as tabelas nunca eram criadas em producao e todos os
 # pedidos a base de dados falhavam.
 base_dados.criar_tabelas()
+
+# Se a base de dados ainda nao tem nenhum satelite guardado (por
+# exemplo, na primeira vez que o servidor arranca num alojamento novo,
+# onde nunca correu a Etapa 4 a mao), populamo-la sozinhos agora. Isto
+# usa o tle.py/satcat.py ja preparados para falhar depressa e cair para
+# a copia de reserva, por isso nao bloqueia o arranque do servidor por
+# muito tempo mesmo sem rede nenhuma.
+if base_dados.total_satelites() == 0:
+    print("Base de dados vazia - a popular pela primeira vez...")
+    try:
+        guardados, sem_info = etapa4_base_dados.popular_base_dados()
+        print(f"Base de dados populada com {guardados} satelites.")
+    except Exception as erro:
+        print(f"Aviso: nao foi possivel popular a base de dados agora ({erro}). "
+              "Pais/ano/tipo vao aparecer desconhecidos ate a proxima tentativa.")
 
 
 @app.route("/")
