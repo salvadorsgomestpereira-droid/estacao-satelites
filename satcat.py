@@ -24,7 +24,9 @@ IDADE_MAXIMA_SEGUNDOS = 12 * 60 * 60  # a mesma regra de 12 horas que usamos par
 
 # Traducao dos codigos de pais/operador mais comuns que aparecem no
 # satcat. Um satelite cujo codigo nao esteja aqui mostra so o codigo -
-# a lista nao precisa de ser perfeita, so util.
+# a lista nao precisa de ser perfeita, so util. Confirmados contra a
+# lista oficial em https://celestrak.org/satcat/sources.php e contra os
+# dados reais descarregados (nenhum codigo aqui e inventado).
 PAISES_OPERADORES = {
     "US": "Estados Unidos",
     "CIS": "Russia / antiga URSS",
@@ -36,8 +38,8 @@ PAISES_OPERADORES = {
     "UK": "Reino Unido",
     "GER": "Alemanha",
     "ITSO": "Intelsat (organizacao internacional)",
-    "SES": "SES (Luxemburgo)",
-    "EUTE": "Eutelsat (Franca)",
+    "SES": "SES",
+    "EUTE": "Eutelsat (organizacao internacional)",
     "CA": "Canada",
     "IT": "Italia",
     "SPN": "Espanha",
@@ -51,8 +53,26 @@ PAISES_OPERADORES = {
     "ARGN": "Argentina",
     "AUS": "Australia",
     "NETH": "Holanda",
-    "IO": "Organizacao internacional",
-    "PL": "Polonia",
+    "POL": "Polonia",
+    "TBD": "Por determinar",
+    "ISS": "Estacao Espacial Internacional (missao multinacional)",
+    "ORB": "Orbcomm (operador comercial)",
+    "CHBZ": "China / Brasil (missao conjunta)",
+    "GLOB": "Globalstar (operador comercial)",
+    "TURK": "Turquia",
+    "ROC": "Taiwan",
+    "FIN": "Finlandia",
+    "SEAL": "Sea Launch (consorcio internacional)",
+    "O3B": "O3b Networks (operador comercial)",
+    "NOR": "Noruega",
+    "SING": "Singapura",
+    "NZ": "Nova Zelandia",
+    "INDO": "Indonesia",
+    "SWTZ": "Suica",
+    "GREC": "Grecia",
+    "IM": "Inmarsat (organizacao internacional)",
+    "AB": "Arabsat (organizacao internacional)",
+    "EUME": "Eumetsat (organizacao internacional)",
 }
 
 TIPOS_OBJETO = {
