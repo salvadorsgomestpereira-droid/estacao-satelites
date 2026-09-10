@@ -249,6 +249,17 @@ Vilamoura (`config.py`). Só a página ao vivo é que se personaliza.
 - *"Como sabes que o cálculo está certo?"* → Confirmámos valores
   conhecidos: a ISS a ~400 km e ~7,7 km/s, o GPS a ~20 200 km, os
   geoestacionários a ~35 786 km — todos batem certo com os valores reais.
+- *"Como sabes que os dados dos satélites (país, tipo) são reais e não
+  inventados?"* → Os TLE e o catálogo vêm sempre descarregados ao vivo
+  do Celestrak (fonte oficial, usada por toda a comunidade de rastreio
+  de satélites). A única parte escrita à mão foi o dicionário em
+  `satcat.py` que traduz os códigos de país (ex.: "US" → "Estados
+  Unidos") para português — e ao verificá-lo código a código contra a
+  lista oficial do Celestrak, encontrei dois que eu tinha escrito
+  errados (`"IO"` e `"PL"`, que não correspondiam a nenhum código real;
+  o código certo da Polónia é `"POL"`). Corrigi-os e confirmei o resto.
+  É um bom exemplo de porque verificar os dados contra a fonte original
+  é importante, mesmo quando o código "parece" funcionar sem erros.
 - *"Porque é que os pedidos de rede têm um tempo-limite (timeout)?"* →
   Sem ele, se o servidor do Celestrak não responder, o programa fica
   bloqueado à espera indefinidamente. Com um tempo-limite curto (8
