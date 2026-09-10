@@ -23,20 +23,21 @@ app = Flask(__name__)
 # pedidos a base de dados falhavam.
 base_dados.criar_tabelas()
 
-# Se a base de dados ainda nao tem nenhum satelite guardado (por
-# exemplo, na primeira vez que o servidor arranca num alojamento novo,
-# onde nunca correu a Etapa 4 a mao), populamo-la sozinhos agora. Isto
-# usa o tle.py/satcat.py ja preparados para falhar depressa e cair para
-# a copia de reserva, por isso nao bloqueia o arranque do servidor por
-# muito tempo mesmo sem rede nenhuma.
-if base_dados.total_satelites() == 0:
-    print("Base de dados vazia - a popular pela primeira vez...")
-    try:
-        guardados, sem_info = etapa4_base_dados.popular_base_dados()
-        print(f"Base de dados populada com {guardados} satelites.")
-    except Exception as erro:
-        print(f"Aviso: nao foi possivel popular a base de dados agora ({erro}). "
-              "Pais/ano/tipo vao aparecer desconhecidos ate a proxima tentativa.")
+# Populamos a base de dados sempre que o servidor arranca - nao so
+# quando esta vazia. tle.py/satcat.py so voltam mesmo a rede se a copia
+# local tiver mais de 12 horas (ver a regra nesses ficheiros), por isso
+# isto normalmente e rapido (le so ficheiros locais). Fazer sempre, e
+# nao so "se vazia", garante que uma correcao ao codigo (por exemplo, a
+# tabela de traducao de paises em satcat.py) chega mesmo aos dados
+# guardados no proximo arranque, em vez de ficar presa numa base de
+# dados antiga.
+print("A popular/atualizar a base de dados...")
+try:
+    guardados, sem_info = etapa4_base_dados.popular_base_dados()
+    print(f"Base de dados atualizada com {guardados} satelites.")
+except Exception as erro:
+    print(f"Aviso: nao foi possivel atualizar a base de dados agora ({erro}). "
+          "A usar o que ja estiver guardado de arranques anteriores.")
 
 
 @app.route("/")
